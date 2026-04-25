@@ -75,7 +75,7 @@ window.enviarWhats = async function () {
   let parcelasQtd = document.getElementById("parcelas").value;
   let dataPagamento = document.getElementById("dataPagamento").value;
 
-  let numero = "5511952154750";
+  let numero = "5511977816342";
 
   let mensagem = `Olá, gostaria de solicitar um empréstimo:
 
