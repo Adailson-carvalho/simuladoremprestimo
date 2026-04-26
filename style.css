@@ -63,7 +63,7 @@ body {
   flex-direction: column;
 }
 
-/* LABELS CORRIGIDAS - NÃO QUEBRAM MAIS */
+/* ESTILO ÚNICO PARA TODAS AS LABELS */
 .input-group label {
   font-weight: 600;
   font-size: 0.7rem;
@@ -294,8 +294,7 @@ body {
   /* LABELS NO MOBILE - MENORES PARA NÃO QUEBRAR */
   .input-group label {
     font-size: 0.6rem;
-    white-space: normal;
-    line-height: 1.2;
+    white-space: nowrap;
   }
   
   .result-content {
@@ -317,8 +316,8 @@ body {
   }
 }
 
-/* Telas muito pequenas */
-@media (max-width: 380px) {
+/* Telas muito pequenas - AQUI É ONDE A LABEL DATA QUEBRAVA */
+@media (max-width: 400px) {
   .card-header h1 {
     font-size: 1.1rem;
   }
@@ -333,8 +332,15 @@ body {
     font-size: 0.9rem;
   }
   
+  /* REDUZ AINDA MAIS A LABEL DA DATA EM TELAS PEQUENAS */
   .input-group label {
     font-size: 0.55rem;
+    white-space: nowrap;
+  }
+  
+  /* Força a label da data a ter o tamanho correto */
+  .input-group:has(#dataPagamento) label {
+    font-size: 0.5rem;
   }
   
   .result-area {
@@ -357,9 +363,12 @@ button {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* ESTILO DO CAMPO DATE - CORRIGIDO */
 input[type="date"] {
   font-family: 'Inter', monospace;
   color: #1a2f3f;
+  min-width: 0;
+  width: 100%;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
