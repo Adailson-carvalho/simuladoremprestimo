@@ -63,9 +63,10 @@ body {
   flex-direction: column;
 }
 
+/* ESTILO PADRÃO PARA TODAS AS LABELS */
 .input-group label {
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #2c3e4e;
@@ -75,9 +76,14 @@ body {
   gap: 6px;
 }
 
+/* LABEL DA DATA ESPECIFICAMENTE MENOR */
+.input-group:has(#dataPagamento) label {
+  font-size: 0.65rem;
+}
+
 .input-group label i {
   width: 1rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #0f6b8c;
 }
 
@@ -288,8 +294,13 @@ body {
     font-size: 0.95rem;
   }
   
+  /* Labels menores no mobile */
   .input-group label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+  }
+  
+  .input-group:has(#dataPagamento) label {
+    font-size: 0.6rem;
   }
   
   .result-content {
@@ -327,6 +338,14 @@ body {
     font-size: 0.9rem;
   }
   
+  .input-group label {
+    font-size: 0.6rem;
+  }
+  
+  .input-group:has(#dataPagamento) label {
+    font-size: 0.55rem;
+  }
+  
   .result-area {
     padding: 0.8rem;
   }
@@ -346,4 +365,15 @@ input[type=number]::-webkit-outer-spin-button {
 /* Melhora toque em botões no mobile */
 button {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Ajuste para o campo date no mobile */
+input[type="date"] {
+  font-family: 'Inter', monospace;
+  color: #1a2f3f;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 5px;
 }
