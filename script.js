@@ -1,11 +1,38 @@
+// ------------------------ MÁSCARA DE VALOR MONETÁRIO -------------------------
+function applyMoneyMask(value) {
+  let cleanValue = value.replace(/\D/g, '');
+  if (cleanValue === '') return '';
+  let numberValue = parseFloat(cleanValue) / 100;
+  return numberValue.toLocaleString('pt-BR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function getRawMoneyValue(maskedValue) {
+  if (!maskedValue) return 0;
+  let cleanValue = maskedValue.replace(/\D/g, '');
+  if (cleanValue === '') return 0;
+  return parseFloat(cleanValue) / 100;
+}
+
+// ------------------------ FUNÇÃO PARA FORMATAR DATA EXIBIÇÃO -----------------
+function formatDateToBr(dateISO) {
+  if (!dateISO) return "";
+  const parts = dateISO.split("-");
+  if (parts.length !== 3) return dateISO;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
 // ------------------------ FUNÇÃO PRINCIPAL DE CÁLCULO -------------------------
 window.calcular = function () {
-  let valor = parseFloat(document.getElementById("valor").value);
+  const valorInput = document.getElementById("valor");
+  let valor = getRawMoneyValue(valorInput.value);
   let n = parseInt(document.getElementById("parcelas").value);
-  let dataPagamento = document.getElementById("dataPagamento").value;
+  let dataPagamentoISO = document.getElementById("dataPagamento").value;
 
-  if (isNaN(valor) || !valor || isNaN(n) || !n) {
-    document.getElementById("resultado").innerHTML = "";
+  if (isNaN(valor) || valor === 0 || isNaN(n) || !n) {
+    document.getElementById("resultado").innerHTML = '<span style="opacity:0.7;">Preencha os campos acima</span>';
     return;
   }
 
@@ -19,14 +46,7 @@ window.calcular = function () {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
   }
 
-  function formatarData(dataISO) {
-    if (!dataISO) return "Não informada";
-    let partes = dataISO.split("-");
-    if (partes.length !== 3) return dataISO;
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
-  }
-
-  let dataFormatada = formatarData(dataPagamento);
+  let dataFormatada = dataPagamentoISO ? formatDateToBr(dataPagamentoISO) : "Não informada";
   let parcelaFormatada = formatarMoeda(parcela);
   let totalFormatado = formatarMoeda(total);
 
@@ -75,16 +95,18 @@ function showToastMessage(msg, isSuccess = true) {
 function generateWhatsAppMessage() {
   const nome = document.getElementById("nome").value.trim();
   let telefone = document.getElementById("telefone").value.trim();
-  let valor = parseFloat(document.getElementById("valor").value);
+  const valorInput = document.getElementById("valor");
+  let valor = getRawMoneyValue(valorInput.value);
   let n = parseInt(document.getElementById("parcelas").value);
-  let dataPagamento = document.getElementById("dataPagamento").value;
+  let dataPagamentoISO = document.getElementById("dataPagamento").value;
+  let dataPagamentoBr = formatDateToBr(dataPagamentoISO);
 
   if (nome === "") {
     showToastMessage("Por favor, informe seu nome completo.", false);
     return null;
   }
   if (telefone === "") {
-    showToastMessage("Informe seu telefone para contato via WhatsApp.", false);
+    showToastMessage("Informe seu telefone para contato.", false);
     return null;
   }
   const rawPhone = getRawPhone(telefone);
@@ -104,7 +126,7 @@ function generateWhatsAppMessage() {
     showToastMessage("Selecione o número de parcelas.", false);
     return null;
   }
-  if (!dataPagamento) {
+  if (!dataPagamentoISO) {
     showToastMessage("Selecione a data de pagamento da primeira parcela.", false);
     return null;
   }
@@ -116,108 +138,102 @@ function generateWhatsAppMessage() {
   let taxaPercentual = Math.round(juros * 100);
 
   const formatMoney = (val) => val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2 });
-  const formatDateBr = (isoDate) => {
-    if (!isoDate) return "Não informada";
-    let parts = isoDate.split("-");
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
-  };
 
   let parcelaFormat = formatMoney(parcela);
   let totalFormat = formatMoney(total);
   let valorFormat = formatMoney(valor);
-  let dataFormatada = formatDateBr(dataPagamento);
   
-  let regimeJuros = valor <= 999.99 ? "TAXA ESPECIAL: 10% ao mês (valores ate R$ 999,99)" : "TAXA REDUZIDA: 7% ao mês (acima de R$ 1.000)";
-
-  // MENSAGEM SEM EMOJIS - APENAS TEXTO PURO PARA GARANTIR FUNCIONAMENTO
   const mensagem = 
-`SIMULADOR ADS - CREDITO PESSOAL
+`*NOVA SIMULACAO DE EMPRESTIMO - ADS*
 ----------------------------------------
 
+DADOS DO CLIENTE:
 NOME: ${nome}
 TELEFONE: ${telefone}
+
+DADOS DA SIMULACAO:
 VALOR SOLICITADO: ${valorFormat}
 PARCELAS: ${n}x
 
 VALOR DA PARCELA: ${parcelaFormat}
 TOTAL A PAGAR: ${totalFormat}
-DATA DA 1° PARCELA: ${dataFormatada}
+DATA DA 1a PARCELA: ${dataPagamentoBr}
 TAXA MENSAL APLICADA: ${taxaPercentual}%
 
 ----------------------------------------
-*Simulacao gerada via sistema*
-*Aguarde! Em breve retornaremos!*
+*Aguarde! Em breve retornaremos o contato!*
 ----------------------------------------`;
 
   return mensagem;
 }
 
-// ------------------------ ENVIO PARA WHATSAPP ---------------------------------
+// ------------------------ ENVIO PARA WHATSAPP (NÚMERO FIXO) --------------------
 function sendToWhatsApp() {
   const message = generateWhatsAppMessage();
   if (!message) return;
   
-  let telefoneRaw = getRawPhone(document.getElementById("telefone").value);
-  if (telefoneRaw.length === 10) telefoneRaw = `55${telefoneRaw}`;
-  else if (telefoneRaw.length === 11) telefoneRaw = `55${telefoneRaw}`;
-  else telefoneRaw = `55${telefoneRaw}`;
-  
+  const numeroConsultor = "5511977816342";
   const encodedMsg = encodeURIComponent(message);
-  const whatsappUrl = `https://wa.me/${telefoneRaw}?text=${encodedMsg}`;
+  const whatsappUrl = `https://wa.me/${numeroConsultor}?text=${encodedMsg}`;
   window.open(whatsappUrl, '_blank');
-  showToastMessage("Redirecionando para o WhatsApp com sua simulacao!", true);
+  showToastMessage("Simulação enviada para o consultor! Redirecionando para o WhatsApp...", true);
 }
 
 // ------------------------ LIMPAR FORMULÁRIO -----------------------------------
 function clearForm() {
   document.getElementById("nome").value = "";
   document.getElementById("telefone").value = "";
-  document.getElementById("valor").value = "2500";
-  document.getElementById("parcelas").value = "3";
+  document.getElementById("valor").value = "";
+  document.getElementById("parcelas").value = "1";
   
-  const today = new Date();
-  let futureDate = new Date(today);
-  futureDate.setDate(today.getDate() + 5);
-  let year = futureDate.getFullYear();
-  let month = String(futureDate.getMonth() + 1).padStart(2, '0');
-  let day = String(futureDate.getDate()).padStart(2, '0');
-  document.getElementById("dataPagamento").value = `${year}-${month}-${day}`;
+  // Data padrão: DIA DE HOJE no formato ISO (yyyy-mm-dd)
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoje.getDate()).padStart(2, '0');
+  document.getElementById("dataPagamento").value = `${ano}-${mes}-${dia}`;
   
   window.calcular();
-  showToastMessage("Todos os campos foram limpos. Simulacao reiniciada.", true);
+  showToastMessage("Todos os campos foram limpos. Simulação reiniciada.", true);
 }
 
 // ------------------------ CONFIGURAÇÃO INICIAL -------------------------------
 function setInitialDate() {
-  if (!document.getElementById("dataPagamento").value) {
-    const hoje = new Date();
-    const dataPadrao = new Date(hoje);
-    dataPadrao.setDate(hoje.getDate() + 5);
-    const ano = dataPadrao.getFullYear();
-    const mes = String(dataPadrao.getMonth() + 1).padStart(2, '0');
-    const dia = String(dataPadrao.getDate()).padStart(2, '0');
-    document.getElementById("dataPagamento").value = `${ano}-${mes}-${dia}`;
-  }
+  // Define a data como o dia de hoje no formato ISO (yyyy-mm-dd)
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoje.getDate()).padStart(2, '0');
+  document.getElementById("dataPagamento").value = `${ano}-${mes}-${dia}`;
 }
 
 function bindEvents() {
   const valorInput = document.getElementById("valor");
-  const parcelasSelect = document.getElementById("parcelas");
+  const parcelasInput = document.getElementById("parcelas");
   const dataInput = document.getElementById("dataPagamento");
 
-  valorInput.addEventListener("input", function() {
-    window.calcular();
-  });
-  parcelasSelect.addEventListener("change", function() {
-    window.calcular();
-  });
-  dataInput.addEventListener("change", function() {
+  valorInput.addEventListener("input", function(e) {
+    let rawValue = e.target.value;
+    let masked = applyMoneyMask(rawValue);
+    e.target.value = masked;
     window.calcular();
   });
   
-  valorInput.addEventListener("blur", function() {
-    let v = parseFloat(valorInput.value);
-    if (!isNaN(v)) valorInput.value = v.toFixed(2);
+  parcelasInput.addEventListener("input", function() {
+    let val = parseInt(parcelasInput.value);
+    if (isNaN(val) || val < 1) parcelasInput.value = 1;
+    if (val > 12) parcelasInput.value = 12;
+    window.calcular();
+  });
+  
+  parcelasInput.addEventListener("change", function() {
+    let val = parseInt(parcelasInput.value);
+    if (isNaN(val) || val < 1) parcelasInput.value = 1;
+    if (val > 12) parcelasInput.value = 12;
+    window.calcular();
+  });
+  
+  dataInput.addEventListener("change", function() {
     window.calcular();
   });
 }
