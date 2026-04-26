@@ -31,8 +31,9 @@ window.calcular = function () {
   let n = parseInt(document.getElementById("parcelas").value);
   let dataPagamentoISO = document.getElementById("dataPagamento").value;
 
-  if (isNaN(valor) || valor === 0 || isNaN(n) || !n) {
-    document.getElementById("resultado").innerHTML = '<span style="opacity:0.7;">Preencha os campos acima</span>';
+  // Verifica se valor ou parcelas são inválidos
+  if (isNaN(valor) || valor === 0 || isNaN(n) || !n || n < 1) {
+    document.getElementById("resultado").innerHTML = '<span style="opacity:0.7;">Preencha o valor e as parcelas corretamente</span>';
     return;
   }
 
@@ -122,8 +123,12 @@ function generateWhatsAppMessage() {
     showToastMessage("Valor muito elevado, entre em contato com nossa equipe.", false);
     return null;
   }
-  if (!n || n < 1) {
-    showToastMessage("Selecione o número de parcelas.", false);
+  if (isNaN(n) || !n || n < 1) {
+    showToastMessage("Informe a quantidade de parcelas (mínimo 1, máximo 24).", false);
+    return null;
+  }
+  if (n > 24) {
+    showToastMessage("Máximo de parcelas é 24.", false);
     return null;
   }
   if (!dataPagamentoISO) {
@@ -160,9 +165,8 @@ TOTAL A PAGAR: ${totalFormat}
 DATA DA 1a PARCELA: ${dataPagamentoBr}
 TAXA MENSAL APLICADA: ${taxaPercentual}%
 
-----------------------------------------
-*Aguarde! Em breve retornaremos o contato!*
-----------------------------------------`;
+*Aguarde! Em breve retornaremos o contato!
+`;
 
   return mensagem;
 }
@@ -184,7 +188,7 @@ function clearForm() {
   document.getElementById("nome").value = "";
   document.getElementById("telefone").value = "";
   document.getElementById("valor").value = "";
-  document.getElementById("parcelas").value = "1";
+  document.getElementById("parcelas").value = "";
   
   // Data padrão: DIA DE HOJE no formato ISO (yyyy-mm-dd)
   const hoje = new Date();
@@ -221,15 +225,20 @@ function bindEvents() {
   
   parcelasInput.addEventListener("input", function() {
     let val = parseInt(parcelasInput.value);
-    if (isNaN(val) || val < 1) parcelasInput.value = 1;
-    if (val > 12) parcelasInput.value = 12;
+    if (!isNaN(val)) {
+      if (val < 1) parcelasInput.value = 1;
+      if (val > 24) parcelasInput.value = 24;
+    }
     window.calcular();
   });
   
   parcelasInput.addEventListener("change", function() {
     let val = parseInt(parcelasInput.value);
-    if (isNaN(val) || val < 1) parcelasInput.value = 1;
-    if (val > 12) parcelasInput.value = 12;
+    if (isNaN(val) || val < 1) {
+      parcelasInput.value = "";
+    } else if (val > 24) {
+      parcelasInput.value = 24;
+    }
     window.calcular();
   });
   
