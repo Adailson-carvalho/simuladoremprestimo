@@ -124,11 +124,11 @@ function generateWhatsAppMessage() {
     return null;
   }
   if (isNaN(n) || !n || n < 1) {
-    showToastMessage("Informe a quantidade de parcelas (mínimo 1, máximo 24).", false);
+    showToastMessage("Informe a quantidade de parcelas (mínimo 1, máximo 12).", false);
     return null;
   }
-  if (n > 24) {
-    showToastMessage("Máximo de parcelas é 24.", false);
+  if (n > 12) {
+    showToastMessage("Máximo de parcelas é .", false);
     return null;
   }
   if (!dataPagamentoISO) {
@@ -149,8 +149,7 @@ function generateWhatsAppMessage() {
   let valorFormat = formatMoney(valor);
   
   const mensagem = 
-`*NOVA SIMULACAO DE EMPRESTIMO - ADS*
-----------------------------------------
+`NOVA SIMULACAO DE EMPRESTIMO - ADS
 
 DADOS DO CLIENTE:
 NOME: ${nome}
@@ -165,7 +164,9 @@ TOTAL A PAGAR: ${totalFormat}
 DATA DA 1a PARCELA: ${dataPagamentoBr}
 TAXA MENSAL APLICADA: ${taxaPercentual}%
 
-*Aguarde! Em breve retornaremos o contato!
+ATENÇÃO: Declaro que as informações fornecidas são verdadeiras. Estou ciente de que, em caso de atraso no pagamento de qualquer parcela, será aplicada uma multa/taxa de juros de 7% sobre o valor da parcela em atraso.
+
+Aguarde! Em breve retornaremos o contato!
 `;
 
   return mensagem;
@@ -227,7 +228,7 @@ function bindEvents() {
     let val = parseInt(parcelasInput.value);
     if (!isNaN(val)) {
       if (val < 1) parcelasInput.value = 1;
-      if (val > 24) parcelasInput.value = 24;
+      if (val > 12) parcelasInput.value = 12;
     }
     window.calcular();
   });
@@ -236,8 +237,8 @@ function bindEvents() {
     let val = parseInt(parcelasInput.value);
     if (isNaN(val) || val < 1) {
       parcelasInput.value = "";
-    } else if (val > 24) {
-      parcelasInput.value = 24;
+    } else if (val > 12) {
+      parcelasInput.value = 12;
     }
     window.calcular();
   });
