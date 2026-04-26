@@ -161,7 +161,7 @@ PARCELAS: ${n}x
 
 VALOR DA PARCELA: ${parcelaFormat}
 TOTAL A PAGAR: ${totalFormat}
-DATA DA 1a PARCELA: ${dataPagamentoBr}
+DATA DA 1° PARCELA: ${dataPagamentoBr}
 TAXA MENSAL APLICADA: ${taxaPercentual}%
 
 ATENÇÃO: Declaro que as informações fornecidas são verdadeiras. Estou ciente de que, em caso de atraso no pagamento de qualquer parcela, será aplicada uma multa/taxa de juros de 7% sobre o valor da parcela em atraso.
