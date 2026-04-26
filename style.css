@@ -63,7 +63,7 @@ body {
   flex-direction: column;
 }
 
-/* ESTILO PADRÃO PARA TODAS AS LABELS */
+/* LABELS CORRIGIDAS - NÃO QUEBRAM MAIS */
 .input-group label {
   font-weight: 600;
   font-size: 0.7rem;
@@ -74,17 +74,14 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-/* LABEL DA DATA ESPECIFICAMENTE MENOR */
-.input-group:has(#dataPagamento) label {
-  font-size: 0.65rem;
+  white-space: nowrap;
 }
 
 .input-group label i {
   width: 1rem;
   font-size: 0.75rem;
   color: #0f6b8c;
+  flex-shrink: 0;
 }
 
 .input-group input, 
@@ -252,7 +249,7 @@ body {
   opacity: 1;
 }
 
-/* Ajustes para iPhone e dispositivos menores */
+/* MOBILE - Ajuste para telas pequenas */
 @media (max-width: 520px) {
   body {
     padding: 0.8rem;
@@ -294,13 +291,11 @@ body {
     font-size: 0.95rem;
   }
   
-  /* Labels menores no mobile */
+  /* LABELS NO MOBILE - MENORES PARA NÃO QUEBRAR */
   .input-group label {
-    font-size: 0.65rem;
-  }
-  
-  .input-group:has(#dataPagamento) label {
     font-size: 0.6rem;
+    white-space: normal;
+    line-height: 1.2;
   }
   
   .result-content {
@@ -322,7 +317,7 @@ body {
   }
 }
 
-/* Para telas muito pequenas (ex: iPhone SE) */
+/* Telas muito pequenas */
 @media (max-width: 380px) {
   .card-header h1 {
     font-size: 1.1rem;
@@ -339,10 +334,6 @@ body {
   }
   
   .input-group label {
-    font-size: 0.6rem;
-  }
-  
-  .input-group:has(#dataPagamento) label {
     font-size: 0.55rem;
   }
   
@@ -351,7 +342,7 @@ body {
   }
 }
 
-/* Remove setas do input number em mobile */
+/* Remove setas do input number */
 input[type=number] {
   appearance: textfield;
   -moz-appearance: textfield;
@@ -362,12 +353,10 @@ input[type=number]::-webkit-outer-spin-button {
   opacity: 0.5;
 }
 
-/* Melhora toque em botões no mobile */
 button {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Ajuste para o campo date no mobile */
 input[type="date"] {
   font-family: 'Inter', monospace;
   color: #1a2f3f;
